@@ -18,11 +18,11 @@
     $Resource_List =  array();
 
 
-  //===============//
- // GET ALL FILES //
-//===============//
+  //===================//
+ // GET ALL FILENAMES //
+//===================//
 
-function Get_All_Files($Path, $Resource_List) {
+function Get_All_Filenames($Path, $Resource_List) {
 
     $Skip_Folders = array('.', '..', '.htaccess', 'cgi-bin', '.assets', 'serviceworker.js', 'sitemap.xml');
 
@@ -34,7 +34,7 @@ function Get_All_Files($Path, $Resource_List) {
 
         if (is_dir($Path.$Subfolders[$i])) {
 
-            $Resource_List = Get_All_Files($Path.$Subfolders[$i].'/', $Resource_List);
+            $Resource_List = Get_All_Filenames($Path.$Subfolders[$i].'/', $Resource_List);
         }
 
         else {
@@ -58,7 +58,7 @@ function Get_All_Files($Path, $Resource_List) {
 }
 
 
-$Complete_Resource_List = Get_All_Files($Path, $Resource_List);
+$Complete_Resource_List = Get_All_Filenames($Path, $Resource_List);
 $Complete_Resource_List = array_unique($Complete_Resource_List);
 sort($Complete_Resource_List);
 
