@@ -24,7 +24,7 @@
 
 function Get_All_Filenames($Path, $Resource_List) {
 
-    $Skip_Folders = array('.', '..', '.htaccess', 'cgi-bin', '.assets', 'serviceworker.js', 'sitemap.xml');
+    $Skip_Folders = array('.', '..', '.htaccess', 'cgi-bin', '.assets', 'assets', 'email-confirmation', 'google5fbf6bda7459ac9e.html', 'new-pages.php', 'robots.txt', 'serviceworker.js', 'sitemap.xml');
 
     $Subfolders = scandir($Path);
 
@@ -84,18 +84,23 @@ $fp = fopen($_SERVER['DOCUMENT_ROOT'].'/sitemap.xml', 'w');
 fwrite($fp, $Ashiva_XML_Sitemap);
 fclose($fp);
 
+echo '<h1>Sitemap Generated ('.$Time_of_Generation.')</h1>';
+echo '<pre>'.htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/sitemap.xml')).'</pre>';
+
+
 
   //====================//
  // UPDATE XML SITEMAP //
 //====================//
 
-if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/.assets/system/sitemaps/xml/archive')) {
-    mkdir($_SERVER['DOCUMENT_ROOT'].'/.assets/system/sitemaps/xml/archive', 0777);
+if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/.assets/system/configuration/sitemaps/xml/archive')) {
+    mkdir($_SERVER['DOCUMENT_ROOT'].'/.assets/system/configuration/sitemaps/xml/archive', 0777);
 }
 
-unlink($_SERVER['DOCUMENT_ROOT']."/.assets/system/sitemaps/xml/archive/sitemap.xml");
-copy($_SERVER['DOCUMENT_ROOT']."/sitemap.xml", $_SERVER['DOCUMENT_ROOT']."/.assets/system/sitemaps/xml/archive/sitemap.xml");
-copy($_SERVER['DOCUMENT_ROOT']."/sitemap.xml", $_SERVER['DOCUMENT_ROOT']."/.assets/system/sitemaps/xml/archive/sitemap_".$Time_of_Generation.".xml");
+unlink($_SERVER['DOCUMENT_ROOT']."/.assets/system/configuration/sitemaps/xml/archive/sitemap.xml");
+copy($_SERVER['DOCUMENT_ROOT']."/sitemap.xml", $_SERVER['DOCUMENT_ROOT']."/.assets/system/configuration/sitemaps/xml/archive/sitemap.xml");
+copy($_SERVER['DOCUMENT_ROOT']."/sitemap.xml", $_SERVER['DOCUMENT_ROOT']."/.assets/system/configuration/sitemaps/xml/archive/sitemap_".$Time_of_Generation.".xml");
 $Ashiva_XML_Sitemap = '';
+
 
 ?>
