@@ -86,6 +86,12 @@ for ($i = 0; $i < count($Complete_Resource_List); $i++) {
   $Resource_Stem = urldecode(str_replace('.assets/content/pages/', '', $Resource_Path).'index.php');
 
   $Resource_Page_Manifest = json_decode(file_get_contents($Resource_Path.'page.json'), TRUE);
+  
+  // IF ROBOTS DIRECTIVES INCLUDE NOINDEX, CONTINUE
+  $Resource_Robots_Directives = $Resource_Page_Manifest['Document_Overview']['Document_Information']['Robots'];
+  if (($Resource_Robots_Directives[0] === TRUE) && (in_array('nofollow', $Resource_Robots_Directives[1]))) continue;
+
+  // LANGUAGE ALTERNATIVES
   $Resource_Language_Alternatives_Array = $Resource_Page_Manifest['Document_Overview']['Document_Information']['Document_Translations'];
 
   $Resource_Language_Alternatives = FALSE;
