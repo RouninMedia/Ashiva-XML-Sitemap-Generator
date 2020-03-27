@@ -96,7 +96,7 @@ for ($i = 0; $i < count($Complete_Resource_List); $i++) {
   $Resource_Page_Manifest = json_decode(file_get_contents($Resource_Path.'page.json'), TRUE);
 
 
-  // SKIP RESOURCE IF RESOURCE'S XML SITEMAPS DOESN'T GREENLIGHT
+  // SKIP RESOURCE IF NO GREEN LIGHT FROM RESOURCE'S XML SITEMAPS
   $Resource_XML_Sitemaps = $Resource_Page_Manifest['Document_Overview']['Document_Information']['XML_Sitemaps'];
   if (($Resource_XML_Sitemaps[0] === FALSE) || (!in_array($Sitemap_Path, $Resource_XML_Sitemaps[1]))) continue;
 
