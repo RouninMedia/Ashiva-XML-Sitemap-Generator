@@ -8,7 +8,6 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 
-
   //*************************//
  // SET UP GLOBAL VARIABLES //
 //*************************//
@@ -17,6 +16,16 @@ $Time_of_Generation = date("Y-m-d_H-i-s");
 $Path = $_SERVER['DOCUMENT_ROOT'].'/.assets/content/pages/';
 $Resource_List =  array();
 
+
+  //**************************//
+ // SET UP SITEMAP VARIABLES //
+//**************************//
+
+$Sitemap_Path = '/.assets/content/sitemaps/xml/documents/sitemap.xml';
+$Sitemap_Path_Archive = array_reverse(explode('/', $Sitemap_Path));
+$Sitemap_Filename = substr($Sitemap_Path_Archive[0], 0, -4);
+$Sitemap_Path_Archive[0] = 'archive';
+$Sitemap_Path_Archive = implode(array_reverse($Sitemap_Path_Archive)).'/';
 
 
   //*******************//
@@ -69,7 +78,6 @@ $Complete_Resource_List = array_unique($Complete_Resource_List);
 sort($Complete_Resource_List);
 
 
-
   //********************//
  // CREATE XML SITEMAP //
 //********************//
@@ -86,10 +94,20 @@ for ($i = 0; $i < count($Complete_Resource_List); $i++) {
   $Resource_Stem = urldecode(str_replace('.assets/content/pages/', '', $Resource_Path).'index.php');
 
   $Resource_Page_Manifest = json_decode(file_get_contents($Resource_Path.'page.json'), TRUE);
-  
-  // IF ROBOTS DIRECTIVES INCLUDE NOINDEX, CONTINUE
+
+
+  // SKIP RESOURCE IF RESOURCE'S XML SITEMAPS DOESN'T GREENLIGHT
+  $Resource_XML_Sitemaps = $Resource_Page_Manifest['Document_Overview']['Document_Information']['XML_Sitemaps'];
+  if (($Resource_XML_Sitemaps[0] === FALSE) || (!in_array($Sitemap_Path, $Resource_XML_Sitemaps[1]))) continue;
+
+  // SKIP RESOURCE IF RESOURCE'S ROBOTS DIRECTIVES INCLUDE NOINDEX
   $Resource_Robots_Directives = $Resource_Page_Manifest['Document_Overview']['Document_Information']['Robots'];
   if (($Resource_Robots_Directives[0] === TRUE) && (in_array('noindex', $Resource_Robots_Directives[1]))) continue;
+
+  // SKIP RESOURCE IF RESOURCE'S CANONICAL URL DIFFERS FROM RESOURCE LOCATION
+  $Resource_Canonical_URL = $Resource_Page_Manifest['Document_Overview']['Document_Information']['Canonical_URL'];
+  if ($Resource_Canonical_URL !== $Resource_Location) continue;
+
 
   // LANGUAGE ALTERNATIVES
   $Resource_Language_Alternatives_Array = $Resource_Page_Manifest['Document_Overview']['Document_Information']['Document_Translations'];
@@ -138,7 +156,7 @@ $Ashiva_XML_Sitemap .= '</urlset>';
  // UPDATE XML SITEMAP //
 //********************//
 
-$fp = fopen($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/sitemap.xml', 'w');
+$fp = fopen($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path, 'w');
 fwrite($fp, $Ashiva_XML_Sitemap);
 fclose($fp);
 
@@ -148,7 +166,7 @@ fclose($fp);
 //*****************************//
 
 echo '<h1>Sitemap Generated ('.$Time_of_Generation.')</h1>';
-echo '<pre>'.htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/sitemap.xml')).'</pre>';
+echo '<pre>'.htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path)).'</pre>';
 
 
   //****************************//
@@ -159,17 +177,17 @@ if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/a
   mkdir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive', 0777);
 }
 
-copy($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/sitemap.xml', $_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive/sitemap_'.$Time_of_Generation.'.xml');
+copy($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path, $_SERVER['DOCUMENT_ROOT'].$Sitemap_Path_Archive.$Sitemap_Filename'_'.$Time_of_Generation.'.xml');
 
-$XML_Sitemap_Archive = array_reverse(scandir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive/'));
+$Archive_Files = array_reverse(scandir($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path_Archive));
 
-for ($i = 0; $i < count($XML_Sitemap_Archive); $i++) {
+for ($i = 0; $i < count($Archive_Files); $i++) {
 
-  if (in_array($XML_Sitemap_Archive[$i], ['.', '..'])) continue;
+  if (in_array($Archive_Files[$i], ['.', '..'])) continue;
   
-  if ($i < 12) continue;
+  if ($i < 16) continue;
 
-  unlink($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive/'.$XML_Sitemap_Archive[$i]);
+  unlink($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path_Archive.$Archive_Files[$i]);
 }
 
 ?>
