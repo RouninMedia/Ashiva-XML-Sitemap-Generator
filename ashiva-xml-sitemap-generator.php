@@ -21,11 +21,10 @@ $Resource_List =  array();
  // SET UP SITEMAP VARIABLES //
 //**************************//
 
-$Sitemap_Path = '/.assets/content/sitemaps/xml/documents/sitemap.xml';
-$Sitemap_Path_Archive = array_reverse(explode('/', $Sitemap_Path));
-$Sitemap_Filename = substr($Sitemap_Path_Archive[0], 0, -4);
-$Sitemap_Path_Archive[0] = 'archive';
-$Sitemap_Path_Archive = implode(array_reverse($Sitemap_Path_Archive)).'/';
+$Sitemap_Filename = 'sitemap';
+$Sitemap_Folder = '/.assets/content/sitemaps/xml/documents/';
+$Sitemap_Path = $Sitemap_Filename + $Sitemap_Folder + '.xml';
+$Sitemap_Archive = $Sitemap_Folder + 'archive/';
 
 
   //*******************//
@@ -96,7 +95,7 @@ for ($i = 0; $i < count($Complete_Resource_List); $i++) {
   $Resource_Page_Manifest = json_decode(file_get_contents($Resource_Path.'page.json'), TRUE);
 
 
-  // SKIP RESOURCE IF NO GREEN LIGHT FROM RESOURCE'S XML SITEMAPS
+  // SKIP RESOURCE IF SITEMAP PATH IS EXCLUDED FROM RESOURCE'S XML SITEMAPS
   $Resource_XML_Sitemaps = $Resource_Page_Manifest['Document_Overview']['Document_Information']['XML_Sitemaps'];
   if (($Resource_XML_Sitemaps[0] === FALSE) || (!in_array($Sitemap_Path, $Resource_XML_Sitemaps[1]))) continue;
 
@@ -177,17 +176,18 @@ if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/a
   mkdir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive', 0777);
 }
 
-copy($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path, $_SERVER['DOCUMENT_ROOT'].$Sitemap_Path_Archive.$Sitemap_Filename'_'.$Time_of_Generation.'.xml');
 
-$Archive_Files = array_reverse(scandir($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path_Archive));
+copy($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path, $_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive.$Sitemap_Filename'_'.$Time_of_Generation.'.xml');
 
-for ($i = 0; $i < count($Archive_Files); $i++) {
+$Sitemap_Archive_Files = array_reverse(scandir($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive));
 
-  if (in_array($Archive_Files[$i], ['.', '..'])) continue;
+for ($i = 0; $i < count($Sitemap_Archive_Files); $i++) {
+
+  if (in_array($Sitemap_Archive_Files[$i], ['.', '..'])) continue;
   
   if ($i < 16) continue;
 
-  unlink($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path_Archive.$Archive_Files[$i]);
+  unlink($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive.$Sitemap_Archive_Files[$i]);
 }
 
 ?>
