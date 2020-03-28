@@ -22,9 +22,9 @@ $Resource_List =  array();
 //**************************//
 
 $Sitemap_Filename = 'sitemap';
-$Sitemap_Folder = '/.assets/content/sitemaps/xml/documents/';
-$Sitemap_Path = $Sitemap_Filename + $Sitemap_Folder + '.xml';
-$Sitemap_Archive = $Sitemap_Folder + 'archive/';
+$Sitemap_Folder = '/.assets/content/sitemaps/xml/pages/';
+$Sitemap_Path = $Sitemap_Folder.$Sitemap_Filename.'.xml';
+$Sitemap_Archive = $Sitemap_Folder.'archive';
 
 
   //*******************//
@@ -94,6 +94,9 @@ for ($i = 0; $i < count($Complete_Resource_List); $i++) {
 
   $Resource_Page_Manifest = json_decode(file_get_contents($Resource_Path.'page.json'), TRUE);
 
+
+  // SKIP RESOURCE IF PAGE MANIFEST OR PAGE IS ABSENT
+  if ((!file_exists($Resource_Path.'page.json')) || (!file_exists($Resource_Path.'index.php'))) continue;
 
   // SKIP RESOURCE IF SITEMAP PATH IS EXCLUDED FROM RESOURCE'S XML SITEMAPS
   $Resource_XML_Sitemaps = $Resource_Page_Manifest['Document_Overview']['Document_Information']['XML_Sitemaps'];
@@ -172,12 +175,12 @@ echo '<pre>'.htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'].$Sitem
  // UPDATE XML SITEMAP ARCHIVE //
 //****************************//
 
-if (!is_dir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive')) {
-  mkdir($_SERVER['DOCUMENT_ROOT'].'/.assets/content/sitemaps/xml/documents/archive', 0777);
+if (!is_dir($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive)) {
+  mkdir($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive, 0777);
 }
 
 
-copy($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path, $_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive.$Sitemap_Filename'_'.$Time_of_Generation.'.xml');
+copy($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path, $_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive.'/'.$Sitemap_Filename.'_'.$Time_of_Generation.'.xml');
 
 $Sitemap_Archive_Files = array_reverse(scandir($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive));
 
@@ -187,7 +190,7 @@ for ($i = 0; $i < count($Sitemap_Archive_Files); $i++) {
   
   if ($i < 16) continue;
 
-  unlink($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive.$Sitemap_Archive_Files[$i]);
+  unlink($_SERVER['DOCUMENT_ROOT'].$Sitemap_Archive.'/'.$Sitemap_Archive_Files[$i]);
 }
 
 ?>
