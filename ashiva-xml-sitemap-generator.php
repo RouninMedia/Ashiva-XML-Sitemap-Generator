@@ -167,7 +167,7 @@ fclose($fp);
  // PRINT XML SITEMAP ON SCREEN //
 //*****************************//
 
-echo '<h1>Sitemap Generated ('.$Time_of_Generation.')</h1>';
+echo '<h1>XML Sitemap Generated ('.$Time_of_Generation.')</h1>';
 echo '<pre>'.htmlspecialchars(file_get_contents($_SERVER['DOCUMENT_ROOT'].$Sitemap_Path)).'</pre>';
 
 
